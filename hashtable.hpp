@@ -44,7 +44,6 @@ public:
 
 		bucket.emplace_back(key, value);
 
-		m_max_nodes = std::max(m_max_nodes, bucket.size());
 		m_entries++;
 		return true;
 	}
@@ -53,11 +52,13 @@ public:
 	{
 		auto& bucket = m_buckets[bucket_index(key)];
 		for (size_t i = 0; i < bucket.size(); i++) {
-			Node& node = bucket[i];
-			if (node.key == key) {
+			if (bucket[i].key == key) {
 				size_t last = bucket.size() - 1;
 				std::swap(bucket[i], bucket[last]);
 				bucket.erase(bucket.begin() + last);
+				if (bucket.empty()) {
+					m_filled--;
+				}
 				m_entries--;
 				return true;
 			}
@@ -93,9 +94,9 @@ public:
 		return m_buckets.size();
 	}
 
-	std::tuple<size_t, double> statistics() const
+	double avg_collisions() const
 	{
-		return std::make_tuple(m_max_nodes, (double)m_entries / (double)m_filled);
+		return (double)m_entries / (double)m_filled;
 	}
 
 private:
@@ -103,7 +104,6 @@ private:
 	{
 		if (load_factor() >= 0.75) {
 			m_filled = 0;
-			m_max_nodes = 0;
 			bucket_t tmp(m_buckets.size() * 2);
 			for (const auto& bucket : m_buckets) {
 				for (const Node& node : bucket) {
@@ -112,7 +112,6 @@ private:
 						m_filled++;
 					}
 					target.push_back(node);
-					m_max_nodes = std::max(m_max_nodes, target.size());
 				}
 			}
 			m_buckets.swap(tmp);
@@ -135,6 +134,5 @@ private:
 	bucket_t m_buckets;
 	HashFn m_hasher;
 	size_t m_entries = 0;
-	size_t m_max_nodes = 0;
 	size_t m_filled = 0;
 };

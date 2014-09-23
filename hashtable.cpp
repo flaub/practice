@@ -14,15 +14,13 @@ void words()
 	std::string line;
 	for (size_t i = 0; std::getline(file, line); i++) {
 		table.insert(line, i);
-		auto stats = table.statistics();
 		if (i % 100 == 0) {
-			printf("[%zu] load_factor: %f size: %zu buckets: %zu max: %zu avg: %f\n", 
+			printf("[%zu] load_factor: %f size: %zu buckets: %zu avg: %f\n", 
 				i, 
 				table.load_factor(), 
 				table.size(), 
 				table.num_buckets(),
-				std::get<0>(stats),
-				std::get<1>(stats)
+				table.avg_collisions()
 			);
 		}
 	}
