@@ -7,8 +7,8 @@ Practice
 - [x] Binary Heap (Array implementation)
 - [ ] Merge Sort
 - [ ] Quick Sort
-- [ ] Hash Table (Array implementation)
+- [x] Hash Table (Array implementation)
 - [ ] Patricia Trie (Radix Tree)
 - [ ] Merkle Tree
 - [ ] strtok
-- [ ] Bloom Filter
+- [x] Bloom Filter
