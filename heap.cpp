@@ -1,4 +1,4 @@
-#include "heap.h"
+#include "heap.hpp"
 #include <iostream>
 #include <cassert>
 

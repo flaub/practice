@@ -11,13 +11,13 @@ all: bin $(BINS)
 bin:
 	mkdir bin
 
-bin/avl: avl.cpp avl.h
+bin/avl: avl.cpp avl.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) avl.cpp -o $@
 
-bin/heap: heap.cpp heap.h
+bin/heap: heap.cpp heap.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) heap.cpp -o $@
 
-bin/trie: trie.cpp trie.h
+bin/trie: trie.cpp trie.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) trie.cpp -o $@
 
 clean:
