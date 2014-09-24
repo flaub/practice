@@ -6,7 +6,8 @@ BINS = \
 	bin/heap \
 	bin/trie \
 	bin/hashtable \
-	bin/bloom_filter
+	bin/bloom_filter \
+	bin/mergesort
 
 all: bin $(BINS)
 
@@ -27,6 +28,9 @@ bin/hashtable: hashtable.cpp hashtable.hpp hash.hpp
 
 bin/bloom_filter: bloom_filter.cpp bloom_filter.hpp packed_vector.hpp hash.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) bloom_filter.cpp -o $@
+
+bin/mergesort: mergesort.cpp mergesort.hpp
+	$(CXX) $(CXXFLAGS) $(CFLAGS) mergesort.cpp -o $@
 
 clean:
 	rm -rf bin
