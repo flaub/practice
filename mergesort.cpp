@@ -24,5 +24,13 @@ int main()
 	}
 	cout << endl;
 
+	merge_sort(test.begin(), test.end());
+
+	cout << "sorted" << endl;
+	for (const int& value : test) {
+		cout << value << " ";
+	}
+	cout << endl;
+
 	return 0;
 }
