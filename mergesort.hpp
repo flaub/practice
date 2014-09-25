@@ -33,7 +33,7 @@ std::vector<typename RandomIt::value_type> merge_(RandomIt first, RandomIt middl
 }
 
 template <class RandomIt>
-void merge_sort_(RandomIt first, RandomIt last)
+void merge_sort(RandomIt first, RandomIt last)
 {
 	size_t distance = std::distance(first, last);
 	if (distance < 2) {
@@ -41,14 +41,8 @@ void merge_sort_(RandomIt first, RandomIt last)
 	}
 
 	RandomIt middle = first + (distance / 2);
-	merge_sort_(first, middle);
-	merge_sort_(middle, last);
+	merge_sort(first, middle);
+	merge_sort(middle, last);
 	auto temp = merge_(first, middle, last);
 	std::copy(temp.begin(), temp.end(), first);
-}
-
-template <class RandomIt>
-void merge_sort(RandomIt first, RandomIt last)
-{
-	merge_sort_(first, last);
 }
