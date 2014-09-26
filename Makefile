@@ -34,6 +34,9 @@ bin/bloom_filter: bloom_filter.cpp bloom_filter.hpp packed_vector.hpp hash.hpp
 bin/mergesort: mergesort.cpp mergesort.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) mergesort.cpp -o $@
 
+bin/quicksort: quicksort.cpp quicksort.hpp
+	$(CXX) $(CXXFLAGS) $(CFLAGS) quicksort.cpp -o $@
+
 bin/strtok: strtok.cpp strtok.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) strtok.cpp -o $@
 
