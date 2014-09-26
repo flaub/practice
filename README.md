@@ -10,5 +10,5 @@ Practice
 - [x] Hash Table (Array implementation)
 - [ ] Patricia Trie (Radix Tree)
 - [ ] Merkle Tree
-- [ ] strtok
+- [x] strtok
 - [x] Bloom Filter
