@@ -45,6 +45,22 @@ void words()
 	for (size_t i = 0; std::getline(file, line); i++) {
 		contains(table, line, i);
 	}
+
+	file.clear();
+	file.seekg(0, ios::beg);
+
+	for (size_t i = 0; std::getline(file, line); i++) {
+		table.erase(line);
+		if (i % 100 == 0) {
+			printf("[%zu] load_factor: %f size: %zu buckets: %zu avg: %f\n", 
+				i, 
+				table.load_factor(), 
+				table.size(), 
+				table.bucket_count(),
+				table.avg_collisions()
+			);
+		}
+	}
 }
 
 int main()
