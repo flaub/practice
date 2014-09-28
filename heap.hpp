@@ -16,9 +16,6 @@ public:
 	typedef std::function<void (const T&)> visitor_f;
 
 public:
-	Heap() = default;
-	~Heap() = default;
-
 	reference front()
 	{
 		return m_array[0];

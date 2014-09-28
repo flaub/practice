@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Werror -g
+CFLAGS = -Wall -Werror -g -O2
 CXXFLAGS = -std=c++11 
 
 BINS = \
@@ -9,7 +9,8 @@ BINS = \
 	bin/bloom_filter \
 	bin/mergesort \
 	bin/quicksort \
-	bin/strtok
+	bin/strtok \
+	bin/anagrams
 
 all: bin $(BINS)
 
@@ -39,6 +40,9 @@ bin/quicksort: quicksort.cpp quicksort.hpp
 
 bin/strtok: strtok.cpp strtok.hpp
 	$(CXX) $(CXXFLAGS) $(CFLAGS) strtok.cpp -o $@
+
+bin/anagrams: anagrams.cpp hashtable.hpp quicksort.hpp
+	$(CXX) $(CXXFLAGS) $(CFLAGS) anagrams.cpp -o $@
 
 clean:
 	rm -rf bin

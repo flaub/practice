@@ -3,14 +3,14 @@
 #include <vector>
 #include <algorithm>
 
-template <class RandomIt>
-std::vector<typename RandomIt::value_type> merge_(RandomIt first, RandomIt middle, RandomIt last)
+template <class ForwardIt>
+std::vector<typename ForwardIt::value_type> merge_(ForwardIt first, ForwardIt middle, ForwardIt last)
 {
-	std::vector<typename RandomIt::value_type> temp;
+	std::vector<typename ForwardIt::value_type> temp;
 	temp.reserve(std::distance(first, last));
 	
-	RandomIt left = first;
-	RandomIt right = middle;
+	ForwardIt left = first;
+	ForwardIt right = middle;
 	
 	while (left < middle && right < last) {
 		if (*left < *right) {
@@ -32,15 +32,15 @@ std::vector<typename RandomIt::value_type> merge_(RandomIt first, RandomIt middl
 	return temp;
 }
 
-template <class RandomIt>
-void merge_sort(RandomIt first, RandomIt last)
+template <class ForwardIt>
+void merge_sort(ForwardIt first, ForwardIt last)
 {
 	size_t distance = std::distance(first, last);
 	if (distance < 2) {
 		return;
 	}
 
-	RandomIt middle = first + (distance / 2);
+	ForwardIt middle = first + (distance / 2);
 	merge_sort(first, middle);
 	merge_sort(middle, last);
 	auto temp = merge_(first, middle, last);

@@ -9,74 +9,100 @@
 template <class K, class V, class HashFn = hash<K>>
 class HashTable
 {
-private:
-	struct Node
-	{
-		Node(K key, V value)
-			: key(key)
-			, value(value)
-		{}
-
-		K key;
-		V value;
-	};
+public:
+	typedef K key_type;
+	typedef V mapped_type;
+	typedef std::pair<K, V> value_type;
+	typedef value_type* iterator;
+	typedef const value_type* const_iterator;
 
 public:
 	HashTable()
 		: m_buckets(100)
+	{}
+
+	iterator end()
 	{
+		return nullptr;
 	}
 
-	bool insert(const K& key, const V& value)
+	const_iterator end() const
+	{
+		return nullptr;
+	}
+
+	std::pair<iterator, bool> insert(const value_type& value)
 	{
 		resize(m_entries + 1);
 
-		auto& bucket = m_buckets[bucket_index(key)];
-		for (const Node& node : bucket) {
-			if (node.key == key) {
-				return false;
+		auto& bucket_ = m_buckets[bucket(value.first)];
+		for (value_type& node : bucket_) {
+			if (node.first == value.first) {
+				return std::make_pair(&node, false);
 			}
 		}
 
-		if (bucket.empty()) {
+		if (bucket_.empty()) {
 			m_filled++;
 		}
 
-		bucket.emplace_back(key, value);
+		bucket_.push_back(value);
 
 		m_entries++;
-		return true;
+		return std::make_pair(&bucket_.back(), true);
 	}
 
-	bool erase(const K& key)
+	size_t erase(const key_type& key)
 	{
-		auto& bucket = m_buckets[bucket_index(key)];
-		for (size_t i = 0; i < bucket.size(); i++) {
-			if (bucket[i].key == key) {
-				size_t last = bucket.size() - 1;
-				std::swap(bucket[i], bucket[last]);
-				bucket.erase(bucket.begin() + last);
-				if (bucket.empty()) {
+		auto& bucket_ = m_buckets[bucket(key)];
+		for (size_t i = 0; i < bucket_.size(); i++) {
+			if (bucket_[i].first == key) {
+ 				size_t last = bucket_.size() - 1;
+				std::swap(bucket_[i], bucket_[last]);
+				bucket_.erase(bucket_.begin() + last);
+				if (bucket_.empty()) {
 					m_filled--;
 				}
 				m_entries--;
-				return true;
+				return 1;
 			}
 		}
 
-		return false;
+		return 0;
 	}
 
-	bool lookup(const K& key, V& value) const
+	mapped_type& operator[](const key_type& key)
 	{
-		const auto& bucket = m_buckets[bucket_index(key)];
-		for (const Node& node : bucket) {
-			if (node.key == key) {
-				value = node.value;
-				return true;
+		auto& bucket_ = m_buckets[bucket(key)];
+		for (value_type& node : bucket_) {
+			if (node.first == key) {
+				return node.second;
 			}
 		}
-		return false;
+		bucket_.emplace_back(key, mapped_type());
+		return bucket_.back().second;
+	}
+
+	iterator find(const key_type& key)
+	{
+		auto& bucket_ = m_buckets[bucket(key)];
+		for (value_type& node : bucket_) {
+			if (node.first == key) {
+				return &node;
+			}
+		}
+		return end();
+	}
+
+	const_iterator find(const key_type& key) const
+	{
+		const auto& bucket_ = m_buckets[bucket(key)];
+		for (const value_type& node : bucket_) {
+			if (node.first == key) {
+				return &node;
+			}
+		}
+		return end();
 	}
 
 	double load_factor() const
@@ -89,9 +115,19 @@ public:
 		return m_entries;
 	}
 
-	size_t num_buckets() const
+	size_t bucket_count() const
 	{
 		return m_buckets.size();
+	}
+
+	size_t bucket_size(size_t n) const
+	{
+		return m_buckets[n].size();
+	}
+
+	size_t bucket(const key_type& key) const
+	{
+		return m_hasher(key) % bucket_count();
 	}
 
 	double avg_collisions() const
@@ -105,9 +141,9 @@ private:
 		if (load_factor() >= 0.75) {
 			m_filled = 0;
 			bucket_t tmp(m_buckets.size() * 2);
-			for (const auto& bucket : m_buckets) {
-				for (const Node& node : bucket) {
-					auto& target = tmp[bucket_index(node.key, tmp.size())];
+			for (const auto& bucket_ : m_buckets) {
+				for (const value_type& node : bucket_) {
+					auto& target = tmp[bucket(node.first, tmp.size())];
 					if (target.empty()) {
 						m_filled++;
 					}
@@ -118,18 +154,13 @@ private:
 		}
 	}
 
-	size_t bucket_index(const K& key) const
-	{
-		return m_hasher(key) % m_buckets.size();
-	}
-
-	size_t bucket_index(const K& key, size_t size) const
+	size_t bucket(const K& key, size_t size) const
 	{
 		return m_hasher(key) % size;
 	}
 
 private:
-	typedef std::vector<Node> nodes_t;
+	typedef std::vector<value_type> nodes_t;
 	typedef std::vector<nodes_t> bucket_t;
 	bucket_t m_buckets;
 	HashFn m_hasher;
