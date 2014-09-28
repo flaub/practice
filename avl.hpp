@@ -1,9 +1,46 @@
 #pragma once
 
-#include <functional>
-#include <algorithm>
-#include <iostream>
 #include <queue>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+
+template <class T>
+void ss_serialize(std::stringstream& ss, const T& value)
+{
+	size_t len = sizeof(value);
+	ss.write((char*)&len, sizeof(len));
+	ss.write((char*)&value, sizeof(value));
+}
+
+template <>
+void ss_serialize(std::stringstream& ss, const std::string& value)
+{
+	size_t len = value.size();
+	ss.write((char*)&len, sizeof(value.size()));
+	ss.write(value.data(), value.size());
+}
+
+template <class T>
+T ss_deserialize(std::stringstream& ss)
+{
+	size_t len;
+	ss.read((char*)&len, sizeof(len));
+	T value;
+	ss.read((char*)&value, len);
+	return value;
+}
+
+template <>
+std::string ss_deserialize(std::stringstream& ss)
+{
+	size_t len;
+	ss.read((char*)&len, sizeof(len));
+	std::vector<char> buf(len);
+	ss.read(buf.data(), buf.size());
+	return std::string(buf.data(), buf.size());
+}
 
 template <class KeyType>
 class AvlTree
@@ -23,12 +60,53 @@ private:
 
 	Node* m_root = nullptr;
 
-public:
-	typedef std::function<void (const KeyType&)> visitor_f;
+	AvlTree(Node* root)
+		: m_root(root)
+	{}
 
+public:
+	typedef KeyType key_type;
+	typedef std::function<void (const KeyType*)> visitor_f;
+
+	AvlTree() = default;
 	~AvlTree()
 	{
 		clean(m_root);
+	}
+
+	static AvlTree<KeyType> deserialize(const std::string& str)
+	{
+		std::stringstream ss(str);
+		return AvlTree<KeyType>(deserialize(ss));
+	}
+
+	static Node* deserialize(std::stringstream& ss)
+	{
+		auto type = ss.get();
+		if (type == 0) {
+			return nullptr;
+		}
+
+		KeyType value = ss_deserialize<KeyType>(ss);
+		Node* node = new Node(value);
+		node->left = deserialize(ss);
+		node->right = deserialize(ss);
+		return node;
+	}
+
+	std::string serialize() const
+	{
+		std::stringstream ss;
+		preorder([&](const KeyType* key) {
+			if (key) {
+				ss.put(1);
+				ss_serialize(ss, *key);
+			}
+			else {
+				ss.put(0);
+			}
+		});
+		return ss.str();
 	}
 
 	void insert(const KeyType& key)
@@ -41,22 +119,22 @@ public:
 		m_root = remove_(m_root, key);
 	}
 
-	void preorder(visitor_f visitor)
+	void preorder(visitor_f visit) const
 	{
-		preorder_(m_root, visitor);
+		preorder_(m_root, visit);
 	}
 
-	void inorder(visitor_f visitor)
+	void inorder(visitor_f visit) const
 	{
-		inorder_(m_root, visitor);
+		inorder_(m_root, visit);
 	}
 
-	void postorder(visitor_f visitor)
+	void postorder(visitor_f visit) const
 	{
-		postorder_(m_root, visitor);
+		postorder_(m_root, visit);
 	}
 
-	void bfs(visitor_f visitor)
+	void bfs(visitor_f visit)
 	{
 		if (!m_root) {
 			return;
@@ -68,7 +146,7 @@ public:
 		while (!queue.empty()) {
 			auto node = queue.front();
 			queue.pop();
-			visitor(node->key);
+			visit(node->key);
 			if (node->left) {
 				queue.push(node->left);
 			}
@@ -95,34 +173,37 @@ private:
 		delete node;
 	}
 
-	void preorder_(Node* node, visitor_f visitor)
+	void preorder_(Node* node, visitor_f visit) const
 	{
 		if (!node) {
+			visit(nullptr);
 			return;
 		}
-		visitor(node->key);
-		preorder_(node->left, visitor);
-		preorder_(node->right, visitor);
+		visit(&node->key);
+		preorder_(node->left, visit);
+		preorder_(node->right, visit);
 	}
 
-	void inorder_(Node* node, visitor_f visitor)
+	void inorder_(Node* node, visitor_f visit) const
 	{
 		if (!node) {
+			visit(nullptr);
 			return;
 		}
-		inorder_(node->left, visitor);
-		visitor(node->key);
-		inorder_(node->right, visitor);
+		inorder_(node->left, visit);
+		visit(&node->key);
+		inorder_(node->right, visit);
 	}
 
-	void postorder_(Node* node, visitor_f visitor)
+	void postorder_(Node* node, visitor_f visit) const
 	{
 		if (!node) {
+			visit(nullptr);
 			return;
 		}
-		postorder_(node->left, visitor);
-		postorder_(node->right, visitor);
-		visitor(node->key);
+		postorder_(node->left, visit);
+		postorder_(node->right, visit);
+		visit(&node->key);
 	}
 
 	void display_(Node* node, int level)

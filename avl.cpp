@@ -3,6 +3,22 @@
 
 using namespace std;
 
+template <class T>
+void display_preorder(const T& tree)
+{
+	typedef typename T::key_type key_type;
+	tree.preorder([] (const key_type* key) {
+		cout << " ";
+		if (key) {
+			cout << *key;
+		}
+		else {
+			cout << "#";
+		}
+	});
+	cout << endl;
+}
+
 int main()
 {
 	AvlTree<int> tree;
@@ -19,18 +35,20 @@ int main()
 
 	cout << "Inserts" << endl;
 	tree.display();
-	tree.preorder([] (const int& key) {
-		cout << key << endl;
-	});
-	cout << endl;
+	display_preorder(tree);
 
 	tree.remove(10);
 
 	cout << "Remove(10)" << endl;
 	tree.display();
-	tree.preorder([] (const int& key) {
-		cout << key << endl;
-	});
+	display_preorder(tree);
+
+	std::string str = tree.serialize();
+	auto copy = AvlTree<int>::deserialize(str);
+	
+	cout << "copy" << endl;
+	copy.display();
+	display_preorder(copy);
 
 	return 0;
 }
