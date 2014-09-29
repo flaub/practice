@@ -51,7 +51,7 @@ public:
 		size_t last = m_array.size() - 1;
 		std::swap(m_array[0], m_array[last]);
 		m_array.erase(m_array.begin() + last);
-		heapify(0);
+		heapify();
 	}
 
 	const_iterator begin() const
@@ -90,25 +90,30 @@ private:
 		return 2 * i + side;
 	}
 
-	void heapify(size_t i)
+	void heapify()
 	{
 		Compare fn = Compare();
 
-		size_t left = child_(i, LEFT);
-		size_t right = child_(i, RIGHT);
-		size_t child = 0;
+		for (size_t i = 0; i < m_array.size(); ) {
+			size_t extreme = 0;
+			size_t left = child_(i, LEFT);
+			size_t right = child_(i, RIGHT);
 
-		if (left < m_array.size()) {
-			child = left;
-		}
+			if (left < m_array.size()) {
+				extreme = left;
+			}
 
-		if (right < m_array.size() && fn(m_array[right], m_array[left])) {
-			child = right;
-		}
+			if (right < m_array.size() && fn(m_array[right], m_array[left])) {
+				extreme = right;
+			}
 
-		if (child && fn(m_array[child], m_array[i])) {
-			std::swap(m_array[child], m_array[i]);
-			heapify(child);
+			if (extreme && fn(m_array[extreme], m_array[i])) {
+				std::swap(m_array[extreme], m_array[i]);
+				i = extreme;
+			}
+			else {
+				break;
+			}
 		}
 	}
 
