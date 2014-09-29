@@ -16,12 +16,12 @@ public:
 	typedef std::function<void (const T&)> visitor_f;
 
 public:
-	reference front()
+	reference top()
 	{
 		return m_array[0];
 	}
 
-	const_reference front() const
+	const_reference top() const
 	{
 		return m_array[0];
 	}
@@ -48,8 +48,9 @@ public:
 			m_array.clear();
 			return;
 		}
-		std::swap(m_array[0], m_array[m_array.size() - 1]);
-		m_array.erase(m_array.begin() + m_array.size() - 1);
+		size_t last = m_array.size() - 1;
+		std::swap(m_array[0], m_array[last]);
+		m_array.erase(m_array.begin() + last);
 		heapify(0);
 	}
 
@@ -93,21 +94,21 @@ private:
 	{
 		Compare fn = Compare();
 
-		size_t extreme = i;
-		auto left = child_(i, LEFT);
-		auto right = child_(i, RIGHT);
+		size_t left = child_(i, LEFT);
+		size_t right = child_(i, RIGHT);
+		size_t child = 0;
 
-		if (left < m_array.size() && fn(m_array[left], m_array[i])) {
-			extreme = left;
+		if (left < m_array.size()) {
+			child = left;
 		}
 
-		if (right < m_array.size() && fn(m_array[right], m_array[i])) {
-			extreme = right;
+		if (right < m_array.size() && fn(m_array[right], m_array[left])) {
+			child = right;
 		}
 
-		if (extreme != i) {
-			std::swap(m_array[i], m_array[extreme]);
-			heapify(extreme);
+		if (child && fn(m_array[child], m_array[i])) {
+			std::swap(m_array[child], m_array[i]);
+			heapify(child);
 		}
 	}
 

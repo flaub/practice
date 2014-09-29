@@ -22,22 +22,27 @@ void max_heap()
 	heap.push(10);
 	heap.push(50);
 	heap.push(5);
+	heap.push(5);
 	heap.push(500);
 
 	dump(heap);
-	assert(heap.front() == 500);
+	assert(heap.top() == 500);
 
 	heap.pop();
 	dump(heap);
-	assert(heap.front() == 50);
+	assert(heap.top() == 50);
 
 	heap.pop();
 	dump(heap);
-	assert(heap.front() == 10);
+	assert(heap.top() == 10);
 
 	heap.pop();
 	dump(heap);
-	assert(heap.front() == 5);
+	assert(heap.top() == 5);
+
+	heap.pop();
+	dump(heap);
+	assert(heap.top() == 5);
 
 	heap.pop();
 	dump(heap);
@@ -51,22 +56,27 @@ void min_heap()
 	heap.push(10);
 	heap.push(50);
 	heap.push(5);
+	heap.push(5);
 	heap.push(500);
 
 	dump(heap);
-	assert(heap.front() == 5);
+	assert(heap.top() == 5);
 
 	heap.pop();
 	dump(heap);
-	assert(heap.front() == 10);
+	assert(heap.top() == 5);
 
 	heap.pop();
 	dump(heap);
-	assert(heap.front() == 50);
+	assert(heap.top() == 10);
 
 	heap.pop();
 	dump(heap);
-	assert(heap.front() == 500);
+	assert(heap.top() == 50);
+
+	heap.pop();
+	dump(heap);
+	assert(heap.top() == 500);
 
 	heap.pop();
 	dump(heap);
