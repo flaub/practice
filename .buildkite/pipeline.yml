@@ -12,5 +12,3 @@ steps:
     command: echo "Hello!"
 
   - wait
-
-  - trigger: Other
