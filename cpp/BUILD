@@ -74,3 +74,8 @@ cc_test(
         "quicksort.hpp",
     ],
 )
+
+cc_test(
+    name = "compiler",
+    srcs = ["compiler.cpp"],
+)
